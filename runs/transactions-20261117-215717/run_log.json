@@ -1,0 +1,158 @@
+[
+  {
+    "step": 1,
+    "lr": 3,
+    "edits": [
+      {
+        "op": "append",
+        "content": "- Determine the sign of the amount: if the line contains \"CR\" or the word \"REFUND\" treat the amount as positive, otherwise make it negative.\n- Parse dates flexibly: accept YYYY\u2011MM\u2011DD, DD/MM/YYYY, DD/MM/YY, or \"DD MMM\" (e.g., \"13 FEB\"). Convert two\u2011digit years to 20YY. Output dates in ISO format (YYYY\u2011MM\u2011DD).\n- Infer currency: default to \"EUR\" unless a dollar sign ($) appears, in which case use \"USD\".\n- Map transaction descriptions to the allowed category vocabulary (all lower\u2011case):\n  * groceries \u2192 \"groceries\"\n  * software \u2192 \"software\"\n  * dining \u2192 \"dining\"\n  * transport \u2192 \"transport\"\n  * travel \u2192 \"travel\"\n  * income \u2192 \"income\"\n  * refund \u2192 \"refund\"\n  * any other description \u2192 choose the closest term from the list above based on common keywords (e.g., \"card payment\" \u2192 \"income\" if it is a credit, otherwise appropriate category).\n- Always output a JSON object with exactly the keys: date, amount, currency, category, using the formats shown in the expected answers."
+      }
+    ],
+    "val_before": 0.3958333333333333,
+    "val_after": 0.7708333333333334,
+    "val_acc_after": 0.3333333333333333,
+    "accepted": true
+  },
+  {
+    "step": 2,
+    "lr": 3,
+    "edits": [
+      {
+        "op": "append",
+        "content": "- Add \"utilities\" to the allowed category vocabulary.\n- Map descriptions containing keywords such as \"electric\", \"energy\", \"gas\", \"power\" to the category \"utilities\"."
+      },
+      {
+        "op": "append",
+        "content": "- When a date string lacks a year component, assume the year 2026."
+      },
+      {
+        "op": "replace",
+        "target": "Convert two\u2011digit years to 20YY.",
+        "content": "Convert two\u2011digit years to 20YY; if the year is missing, use 2026 as the default year."
+      }
+    ],
+    "val_before": 0.7708333333333334,
+    "val_after": 0.875,
+    "val_acc_after": 0.5833333333333334,
+    "accepted": true
+  },
+  {
+    "step": 3,
+    "lr": 3,
+    "edits": [
+      {
+        "op": "append",
+        "content": "- Infer currency: default to \"EUR\" unless a dollar sign ($) appears (use \"USD\") or a pound sign (\u00a3) appears (use \"GBP\")."
+      },
+      {
+        "op": "append",
+        "content": "- Map transaction descriptions containing keywords such as \"rent\", \"transfer\", \"to \", \"payment to\", \"card payment\" (when not a credit) to the category \"transfer\"."
+      },
+      {
+        "op": "append",
+        "content": "- Map descriptions containing keywords like \"fee\", \"fx fee\", \"account maint\" to the category \"fees\" (overriding other category rules)."
+      }
+    ],
+    "val_before": 0.875,
+    "val_after": 0.875,
+    "val_acc_after": 0.5,
+    "accepted": false
+  },
+  {
+    "step": 4,
+    "lr": 2,
+    "edits": [
+      {
+        "op": "append",
+        "content": "- Infer currency: default to \"EUR\" unless a dollar sign ($) appears (use \"USD\") or a pound sign (\u00a3) appears (use \"GBP\")."
+      },
+      {
+        "op": "append",
+        "content": "- Map descriptions containing keywords such as \"fee\", \"fees\", \"account maint\", \"fx fee\" to the category \"fees\" (overriding other category rules)."
+      }
+    ],
+    "val_before": 0.875,
+    "val_after": 0.9375,
+    "val_acc_after": 0.75,
+    "accepted": true
+  },
+  {
+    "step": 5,
+    "lr": 2,
+    "edits": [
+      {
+        "op": "append",
+        "content": "- Add \"transfer\" to the allowed category vocabulary."
+      },
+      {
+        "op": "append",
+        "content": "- Map descriptions containing keywords such as \"rent\", \"transfer\", \"to \", \"payment to\", \"card payment\" (when not a credit) to the category \"transfer\" (overriding other category rules)."
+      }
+    ],
+    "val_before": 0.9375,
+    "val_after": 0.8541666666666666,
+    "val_acc_after": 0.4166666666666667,
+    "accepted": false
+  },
+  {
+    "step": 6,
+    "lr": 2,
+    "edits": [
+      {
+        "op": "append",
+        "content": "- Add \"transfer\" to the allowed category vocabulary."
+      },
+      {
+        "op": "append",
+        "content": "- Map any description that contains the keyword \"to \" (case\u2011insensitive) or the word \"transfer\" to the category \"transfer\", and let this rule override all other category mappings."
+      }
+    ],
+    "val_before": 0.9375,
+    "val_after": 0.875,
+    "val_acc_after": 0.75,
+    "accepted": false
+  },
+  {
+    "step": 7,
+    "lr": 1,
+    "edits": [
+      {
+        "op": "append",
+        "content": "- Add \"transfer\" to the allowed category vocabulary.\n- Map descriptions containing keywords such as \"rent\", \"transfer\", \"to \", \"payment to\", or \"card payment\" (when not a credit) to the category \"transfer\", overriding other category rules."
+      }
+    ],
+    "val_before": 0.9375,
+    "val_after": 0.875,
+    "val_acc_after": 0.5,
+    "accepted": false
+  },
+  {
+    "step": 8,
+    "lr": 1,
+    "edits": [
+      {
+        "op": "append",
+        "content": "- Map descriptions containing the standalone keyword \"to\" (case\u2011insensitive) to the category \"transfer\", overriding other mappings. Additionally, map common grocery retailer keywords such as \"centra\", \"supermarket\", \"market\", \"tesco\" to the category \"groceries\"."
+      }
+    ],
+    "val_before": 0.9375,
+    "val_after": 0.9583333333333334,
+    "val_acc_after": 0.8333333333333334,
+    "accepted": true
+  },
+  {
+    "step": 9,
+    "lr": 1,
+    "edits": [
+      {
+        "op": "replace",
+        "target": "- Determine the sign of the amount: if the line contains \"CR\" or the word \"REFUND\" treat the amount as positive, otherwise make it negative.",
+        "content": "- Determine the sign of the amount: if the line contains the exact token \"CR\" or the whole word \"REFUND\" (case\u2011insensitive) treat the amount as positive; any other occurrence such as \"REF\" does not affect the sign and the amount should be negative."
+      }
+    ],
+    "val_before": 0.9583333333333334,
+    "val_after": 0.8958333333333334,
+    "val_acc_after": 0.8333333333333334,
+    "accepted": false
+  }
+]

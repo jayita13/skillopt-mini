@@ -1,0 +1,14 @@
+{
+  "task": "transactions",
+  "target": "openai/gpt-oss-20b",
+  "optimizer": "openai/gpt-oss-120b",
+  "test_before": 0.0,
+  "test_after": 0.5833333333333334,
+  "test_fields_before": 0.4583333333333333,
+  "test_fields_after": 0.8854166666666666,
+  "accepted_edits": 4,
+  "steps": 6,
+  "model_calls": 186,
+  "tokens": 120540,
+  "minutes": 11.8
+}

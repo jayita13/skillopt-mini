@@ -1,0 +1,62 @@
+task: bank-statement line -> ledger entry   train/val/test = 24/12/24
+target=openai/gpt-oss-20b  optimizer=openai/gpt-oss-120b  gateway=https://api.groq.com/openai/v1
+baseline on held-out test xxxxxxxxxxxxxxxxxxxxxxxx 
+baseline on validation    xxxxxxxxxxxx 
+start   val=0% (fields 40%)  test=0%
+
+[epoch 1 step 1/6] rollout xxxxxxxx batch acc=0%  lr=3
+   validating candidate xxxxxxxxxxx. 
+   + append: - Determine the sign of the amount: if the line contains a leading '-' or the transaction type is a debit (e.g
+   + append: - Parse dates flexibly: accept ISO (YYYY-MM-DD), slash-separated (DD/MM/YYYY or MM/DD/YYYY) and month‑name for
+   + append: - Map merchants/keywords to a fixed lowercase category vocabulary. Use the following mappings (case‑insensitiv
+   val 0% -> 8%  (fields 40% -> 67%)  ACCEPTED
+[epoch 1 step 2/6] rollout xxxxxxxx batch acc=0%  lr=3
+   validating candidate .xxxxx.xx... 
+   + append: - If the line does not contain an explicit credit indicator (e.g., "CR", "CREDIT", "REFUND"), treat the amount
+   val 8% -> 42%  (fields 67% -> 85%)  ACCEPTED
+[epoch 1 step 3/6] rollout x.xxxxxx batch acc=12%  lr=2
+   validating candidate ..x.xx.x..x. 
+   + append: - Extend the software category mapping with keywords: "AWS", "AMAZON WEB SERVICES", "OPENAI", "CHATGPT", "NOTI
+   + append: - Add two generic category rules: if the line contains the keyword "FEE" (case‑insensitive) assign category "f
+   val 42% -> 58%  (fields 85% -> 90%)  ACCEPTED
+[epoch 2 step 4/6] rollout ....x.xx batch acc=62%  lr=2
+   validating candidate ..x.xx.x.x.x 
+   x append: - Add a currency normalization rule: when the amount is prefixed by a symbol, map "$" → "USD", "£" → "GBP", "€
+   x append: - Extend the travel category keywords (case‑insensitive) to include airline and booking names such as "EASYJET
+   val 58% -> 50%  (fields 90% -> 85%)  REJECTED, rolled back
+[epoch 2 step 5/6] rollout ....x..x batch acc=75%  lr=1
+   validating candidate ..x.x..x.xx. 
+   x append: - If no currency symbol or code is present, set "currency" to "EUR". When a two‑digit year is parsed, prepend 
+   val 58% -> 58%  (fields 90% -> 90%)  REJECTED, rolled back
+[epoch 2 step 6/6] rollout x......x batch acc=75%  lr=1
+   validating candidate ..x.xx...x.. 
+   + append: - Add a generic category rule: if the line starts with the word "TO" (case‑insensitive) assign category "trans
+   val 58% -> 67%  (fields 90% -> 92%)  ACCEPTED
+
+final skill on held-out test x.xxx......x.xxxxx...... 
+
+TEST ACCURACY  0% -> 58%   (fields 46% -> 89%; model weights unchanged)
+accepted edits: 4   model calls: 186   tokens: 120540   time: 11.8 min
+wrote runs/transactions-20261117-171414/ and skills/transactions.md
+
+# Skill: bank transaction normaliser
+- Read the bank statement line and return a JSON object with the keys date, amount, currency and category.
+- Determine the sign of the amount: if the line contains a leading '-' or the transaction type is a debit (e.g., "Card Payment", "CARD PAYMENT", "PURCHASE"), make the amount negative; if it contains "CR", "CREDIT", "REFUND" or similar credit indicators, keep the amount positive.
+- Parse dates flexibly: accept ISO (YYYY-MM-DD), slash-separated (DD/MM/YYYY or MM/DD/YYYY) and month‑name formats. When ambiguous, assume DD/MM/YYYY. Output the date in ISO format (YYYY-MM-DD).
+- Map merchants/keywords to a fixed lowercase category vocabulary. Use the following mappings (case‑insensitive):
+  * "Lidl", "Tesco", "Supermarket", "Grocery" → "groceries"
+  * "Notion", "Software", "App", "SaaS" → "software"
+  * "Uber", "Uber *EATS", "FreeNow", "Taxi", "Ride" → "transport"
+  * "Restaurant", "Cafe", "Food", "Dining" → "dining"
+  * "Delta Air", "Ryanair", "Flight", "Travel" → "travel"
+  * "Salary", "Credit", "Income", "SEPA CREDIT" → "income"
+  * "Refund" → "refund"
+  * any other transaction → "unknown"
+  Ensure the output category string is exactly the lowercase term from this list.
+- If the line does not contain an explicit credit indicator (e.g., "CR", "CREDIT", "REFUND"), treat the amount as a debit and make it negative.
+- When the year is not present, assume the current year (the year of execution, e.g., 2026).
+- Extend the category mapping with utility keywords (case‑insensitive): "Electric", "Energy", "Power", "Gas", "Water" → "utilities".
+- Extend the software category mapping with keywords: "AWS", "AMAZON WEB SERVICES", "OPENAI", "CHATGPT", "NOTION", "SOFTWARE", "APP", "SAAS" → "software".
+- Add two generic category rules: if the line contains the keyword "FEE" (case‑insensitive) assign category "fees"; if it contains "RENT" or the word "TRANSFER" assign category "transfer".
+- Add a generic category rule: if the line starts with the word "TO" (case‑insensitive) assign category "transfer"; if the line contains the keyword "EATS" (case‑insensitive) assign category "dining" (overriding the generic transport rule).
+

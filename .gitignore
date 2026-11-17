@@ -1,0 +1,12 @@
+/best_skill.md
+/run_log.json
+.env
+__pycache__/
+
+# local junk
+.DS_Store
+.venv/
+venv/
+.pytest_cache/
+*.pyc
+runs/mock/

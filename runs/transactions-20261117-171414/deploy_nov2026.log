@@ -1,0 +1,44 @@
+seed skill    (16 lines) xxxxxxxxxxxxxxxx
+
+== BEFORE: seed skill   correct rows: 0/16
+  date            amount cur  category   line
+✗ 2023-11-01       62.35 EUR  Groceries  01/11 POS TESCO STORES 3124 DUBLIN 2 62,35
+✗ 2023-11-02       18.40 EUR  Transport  02/11 POS UBER *TRIP DUBLIN 2 18,40
+✗ 2026-11-03       27.90 EUR  Food & Dri 03/11/2026 CARD PAYMENT UBER *EATS 27,90
+✗ 2023-11-03        7.80 EUR  Food & Dri 03/11 POS BEWLEYS CAFE DUBLIN 2 7,80
+✗ 2026-11-04       96.12 EUR  Utilities  DD ELECTRIC IRELAND REF44812 04.11.26 96,12
+✗ 2023-11-05     4812.77 EUR  Salary     05/11 SEPA CREDIT NORTHWIND TECH SALARY NOV 4.812,77 CR
+✗ 2023-11-06       21.00 USD  software   6 NOV CARD GITHUB INC $21.00
+✗ 2027-11-26     1150.00 EUR  RENT       07-11-26 TO S OBRIEN RENT 1.150,00
+✗ 2026-11-08     -189.99 EUR  Card Payme 2026-11-08,Card Payment,Ryanair Fr2k9p,-189.99,EUR
+✗ 2026-11-08       65.00 EUR  Broadband  DD EIR BROADBAND REF55120 08.11.26 65,00
+✗ 2023-11-09       -0.58 EUR  FX fee     09/11 FX FEE NON-EUR TXN 0,58
+✗ 2026-11-10       12.50 EUR  Refund     REFUND DELIVEROO.IE 10/11/26 12,50 CR
+✗ 2026-11-10       24.60 EUR  card payme 10/11/2026 CARD PAYMENT OPENAI *CHATGPT 24,60
+✗ 2023-11-11       20.00 EUR  Card Top‑u 11/11 POS LEAP CARD TOPUP DUBLIN 2 20,00
+✗ 2023-11-12        8.45 GBP  Food       12 NOV CARD PRET A MANGER £8.45
+✗ 2024-11-26      200.00 EUR  Top‑up     12-11-26 REVOLUT**TOPUP* 200,00
+  spend report: Broadband EUR 65.00, Card Payment EUR -189.99, Card Top‑up EUR 20.00, FX fee EUR -0.58, Food & Drink EUR 35.70, Groceries EUR 62.35, RENT EUR 1,150.00, Refund EUR 12.50, Salary EUR 4,812.77, Top‑up EUR 200.00, Transport EUR 18.40, Utilities EUR 96.12, card payment EUR 24.60, Food GBP 8.45, software USD 21.00
+trained skill (16 lines) ......x..x.x.xxx
+
+== AFTER: trained skill (transactions.md)   correct rows: 10/16
+  date            amount cur  category   line
+✓ 2026-11-01      -62.35 EUR  groceries  01/11 POS TESCO STORES 3124 DUBLIN 2 62,35
+✓ 2026-11-02      -18.40 EUR  transport  02/11 POS UBER *TRIP DUBLIN 2 18,40
+✓ 2026-11-03      -27.90 EUR  dining     03/11/2026 CARD PAYMENT UBER *EATS 27,90
+✓ 2026-11-03       -7.80 EUR  dining     03/11 POS BEWLEYS CAFE DUBLIN 2 7,80
+✓ 2026-11-04      -96.12 EUR  utilities  DD ELECTRIC IRELAND REF44812 04.11.26 96,12
+✓ 2026-11-05     4812.77 EUR  income     05/11 SEPA CREDIT NORTHWIND TECH SALARY NOV 4.812,77 CR
+✗ 2026-11-06      -21.00 USD  unknown    6 NOV CARD GITHUB INC $21.00
+✓ 2026-11-07    -1150.00 EUR  transfer   07-11-26 TO S OBRIEN RENT 1.150,00
+✓ 2026-11-08     -189.99 EUR  travel     2026-11-08,Card Payment,Ryanair Fr2k9p,-189.99,EUR
+✗ 2026-11-08      -65.00 EUR  unknown    DD EIR BROADBAND REF55120 08.11.26 65,00
+✓ 2026-11-09       -0.58 EUR  fees       09/11 FX FEE NON-EUR TXN 0,58
+✗ 2026-11-10       12.50      refund     REFUND DELIVEROO.IE 10/11/26 12,50 CR
+✓ 2026-11-10      -24.60 EUR  software   10/11/2026 CARD PAYMENT OPENAI *CHATGPT 24,60
+✗ 2026-11-11      -20.00 EUR  unknown    11/11 POS LEAP CARD TOPUP DUBLIN 2 20,00
+✗ 2026-11-12       -8.45 GBP  unknown    12 NOV CARD PRET A MANGER £8.45
+✗ 2026-11-12     -200.00 EUR  unknown    12-11-26 REVOLUT**TOPUP* 200,00
+  spend report: refund  12.50, dining EUR -35.70, fees EUR -0.58, groceries EUR -62.35, income EUR 4,812.77, software EUR -24.60, transfer EUR -1,150.00, transport EUR -18.40, travel EUR -189.99, unknown EUR -285.00, utilities EUR -96.12, unknown GBP -8.45, unknown USD -21.00
+
+wrote nov2026.ledger.csv   model calls: 32   tokens: 16780

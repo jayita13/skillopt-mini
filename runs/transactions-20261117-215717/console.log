@@ -1,0 +1,80 @@
+task: bank-statement line -> ledger entry   train/val/test = 24/12/24
+target=openai/gpt-oss-20b  optimizer=openai/gpt-oss-120b  gateway=https://api.groq.com/openai/v1
+baseline on held-out test xxxxxxxxxxxxxxxxxxxxxxxx 
+baseline on validation    xxxxxxxxxxxx 
+start   val=0% (fields 40%)  test=0%
+
+[epoch 1 step 1/9] rollout xxxxxxxx batch acc=0%  lr=3
+   validating candidate x.xxx..xxxx. 
+   + append: - Determine the sign of the amount: if the line contains "CR" or the word "REFUND" treat the amount as positiv
+   val 0% -> 33%  (fields 40% -> 77%)  ACCEPTED
+[epoch 1 step 2/9] rollout xx.x..xx batch acc=38%  lr=3
+   validating candidate ..xx...xx.x. 
+   + append: - Add "utilities" to the allowed category vocabulary.
+- Map descriptions containing keywords such as "electric
+   + append: - When a date string lacks a year component, assume the year 2026.
+   + replace: Convert two‑digit years to 20YY; if the year is missing, use 2026 as the default year.
+   val 33% -> 58%  (fields 77% -> 88%)  ACCEPTED
+[epoch 1 step 3/9] rollout .xxxx..x batch acc=38%  lr=3
+   validating candidate .xxx...x..xx 
+   x append: - Infer currency: default to "EUR" unless a dollar sign ($) appears (use "USD") or a pound sign (£) appears (u
+   x append: - Map transaction descriptions containing keywords such as "rent", "transfer", "to ", "payment to", "card paym
+   x append: - Map descriptions containing keywords like "fee", "fx fee", "account maint" to the category "fees" (overridin
+   val 58% -> 50%  (fields 88% -> 88%)  REJECTED, rolled back
+[epoch 2 step 4/9] rollout .x.....x batch acc=75%  lr=2
+   validating candidate ..xx...x.... 
+   + append: - Infer currency: default to "EUR" unless a dollar sign ($) appears (use "USD") or a pound sign (£) appears (u
+   + append: - Map descriptions containing keywords such as "fee", "fees", "account maint", "fx fee" to the category "fees"
+   val 58% -> 75%  (fields 88% -> 94%)  ACCEPTED
+[epoch 2 step 5/9] rollout x....... batch acc=88%  lr=2
+   validating candidate .xxxx..x..xx 
+   x append: - Add "transfer" to the allowed category vocabulary.
+   x append: - Map descriptions containing keywords such as "rent", "transfer", "to ", "payment to", "card payment" (when n
+   val 75% -> 42%  (fields 94% -> 85%)  REJECTED, rolled back
+[epoch 2 step 6/9] rollout .......x batch acc=88%  lr=2
+   validating candidate ..xxx....... 
+   x append: - Add "transfer" to the allowed category vocabulary.
+   x append: - Map any description that contains the keyword "to " (case‑insensitive) or the word "transfer" to the categor
+   val 75% -> 75%  (fields 94% -> 88%)  REJECTED, rolled back
+[epoch 3 step 7/9] rollout ...x.... batch acc=88%  lr=1
+   validating candidate .xxx...x..xx 
+   x append: - Add "transfer" to the allowed category vocabulary.
+- Map descriptions containing keywords such as "rent", "t
+   val 75% -> 50%  (fields 94% -> 88%)  REJECTED, rolled back
+[epoch 3 step 8/9] rollout ...xx... batch acc=75%  lr=1
+   validating candidate ..xx........ 
+   + append: - Map descriptions containing the standalone keyword "to" (case‑insensitive) to the category "transfer", overr
+   val 75% -> 83%  (fields 94% -> 96%)  ACCEPTED
+[epoch 3 step 9/9] rollout x....... batch acc=88%  lr=1
+   validating candidate ..xx........ 
+   x replace: - Determine the sign of the amount: if the line contains the exact token "CR" or the whole word "REFUND" (case
+   val 83% -> 83%  (fields 96% -> 90%)  REJECTED, rolled back
+
+final skill on held-out test x.x.x.........x.x....... 
+
+TEST ACCURACY  0% -> 79%   (fields 44% -> 93%; model weights unchanged)
+accepted edits: 4   model calls: 249   tokens: 157493   time: 15.9 min
+wrote runs/transactions-20261117-215717/ and skills/transactions.md
+
+# Skill: bank transaction normaliser
+- Read the bank statement line and return a JSON object with the keys date, amount, currency and category.
+- Determine the sign of the amount: if the line contains "CR" or the word "REFUND" treat the amount as positive, otherwise make it negative.
+- Parse dates flexibly: accept YYYY‑MM‑DD, DD/MM/YYYY, DD/MM/YY, or "DD MMM" (e.g., "13 FEB"). Convert two‑digit years to 20YY; if the year is missing, use 2026 as the default year. Output dates in ISO format (YYYY‑MM‑DD).
+- Infer currency: default to "EUR" unless a dollar sign ($) appears, in which case use "USD".
+- Map transaction descriptions to the allowed category vocabulary (all lower‑case):
+  * groceries → "groceries"
+  * software → "software"
+  * dining → "dining"
+  * transport → "transport"
+  * travel → "travel"
+  * income → "income"
+  * refund → "refund"
+  * any other description → choose the closest term from the list above based on common keywords (e.g., "card payment" → "income" if it is a credit, otherwise appropriate category).
+- Always output a JSON object with exactly the keys: date, amount, currency, category, using the formats shown in the expected answers.
+- Add "utilities" to the allowed category vocabulary.
+- Map descriptions containing keywords such as "electric", "energy", "gas", "power" to the category "utilities".
+- When a date string lacks a year component, assume the year 2026.
+- Infer currency: default to "EUR" unless a dollar sign ($) appears (use "USD") or a pound sign (£) appears (use "GBP").
+- Map descriptions containing keywords such as "fee", "fees", "account maint", "fx fee" to the category "fees" (overriding other category rules).
+- Map descriptions containing the standalone keyword "to" (case‑insensitive) to the category "transfer", overriding other mappings. Additionally, map common grocery retailer keywords such as "centra", "supermarket", "market", "tesco" to the category "groceries".
+

@@ -1,0 +1,102 @@
+[
+  {
+    "step": 1,
+    "lr": 3,
+    "edits": [
+      {
+        "op": "append",
+        "content": "- Determine the sign of the amount: if the line contains a leading '-' or the transaction type is a debit (e.g., \"Card Payment\", \"CARD PAYMENT\", \"PURCHASE\"), make the amount negative; if it contains \"CR\", \"CREDIT\", \"REFUND\" or similar credit indicators, keep the amount positive."
+      },
+      {
+        "op": "append",
+        "content": "- Parse dates flexibly: accept ISO (YYYY-MM-DD), slash-separated (DD/MM/YYYY or MM/DD/YYYY) and month\u2011name formats. When ambiguous, assume DD/MM/YYYY. Output the date in ISO format (YYYY-MM-DD)."
+      },
+      {
+        "op": "append",
+        "content": "- Map merchants/keywords to a fixed lowercase category vocabulary. Use the following mappings (case\u2011insensitive):\n  * \"Lidl\", \"Tesco\", \"Supermarket\", \"Grocery\" \u2192 \"groceries\"\n  * \"Notion\", \"Software\", \"App\", \"SaaS\" \u2192 \"software\"\n  * \"Uber\", \"Uber *EATS\", \"FreeNow\", \"Taxi\", \"Ride\" \u2192 \"transport\"\n  * \"Restaurant\", \"Cafe\", \"Food\", \"Dining\" \u2192 \"dining\"\n  * \"Delta Air\", \"Ryanair\", \"Flight\", \"Travel\" \u2192 \"travel\"\n  * \"Salary\", \"Credit\", \"Income\", \"SEPA CREDIT\" \u2192 \"income\"\n  * \"Refund\" \u2192 \"refund\"\n  * any other transaction \u2192 \"unknown\"\n  Ensure the output category string is exactly the lowercase term from this list."
+      }
+    ],
+    "val_before": 0.3958333333333333,
+    "val_after": 0.6666666666666666,
+    "val_acc_after": 0.08333333333333333,
+    "accepted": true
+  },
+  {
+    "step": 2,
+    "lr": 3,
+    "edits": [
+      {
+        "op": "append",
+        "content": "- If the line does not contain an explicit credit indicator (e.g., \"CR\", \"CREDIT\", \"REFUND\"), treat the amount as a debit and make it negative.\n- When the year is not present, assume the current year (the year of execution, e.g., 2026).\n- Extend the category mapping with utility keywords (case\u2011insensitive): \"Electric\", \"Energy\", \"Power\", \"Gas\", \"Water\" \u2192 \"utilities\"."
+      }
+    ],
+    "val_before": 0.6666666666666666,
+    "val_after": 0.8541666666666666,
+    "val_acc_after": 0.4166666666666667,
+    "accepted": true
+  },
+  {
+    "step": 3,
+    "lr": 2,
+    "edits": [
+      {
+        "op": "append",
+        "content": "- Extend the software category mapping with keywords: \"AWS\", \"AMAZON WEB SERVICES\", \"OPENAI\", \"CHATGPT\", \"NOTION\", \"SOFTWARE\", \"APP\", \"SAAS\" \u2192 \"software\"."
+      },
+      {
+        "op": "append",
+        "content": "- Add two generic category rules: if the line contains the keyword \"FEE\" (case\u2011insensitive) assign category \"fees\"; if it contains \"RENT\" or the word \"TRANSFER\" assign category \"transfer\"."
+      }
+    ],
+    "val_before": 0.8541666666666666,
+    "val_after": 0.8958333333333334,
+    "val_acc_after": 0.5833333333333334,
+    "accepted": true
+  },
+  {
+    "step": 4,
+    "lr": 2,
+    "edits": [
+      {
+        "op": "append",
+        "content": "- Add a currency normalization rule: when the amount is prefixed by a symbol, map \"$\" \u2192 \"USD\", \"\u00a3\" \u2192 \"GBP\", \"\u20ac\" \u2192 \"EUR\" (and any other common symbols) and use the mapped ISO code as the currency value."
+      },
+      {
+        "op": "append",
+        "content": "- Extend the travel category keywords (case\u2011insensitive) to include airline and booking names such as \"EASYJET\", \"RYANAIR\", \"SKYSCANNER\", \"EXPEDIA\", etc., mapping them to the \"travel\" category."
+      }
+    ],
+    "val_before": 0.8958333333333334,
+    "val_after": 0.8541666666666666,
+    "val_acc_after": 0.5,
+    "accepted": false
+  },
+  {
+    "step": 5,
+    "lr": 1,
+    "edits": [
+      {
+        "op": "append",
+        "content": "- If no currency symbol or code is present, set \"currency\" to \"EUR\". When a two\u2011digit year is parsed, prepend \"20\" to form a four\u2011digit year (e.g., \"25\" \u2192 \"2025\")."
+      }
+    ],
+    "val_before": 0.8958333333333334,
+    "val_after": 0.8958333333333334,
+    "val_acc_after": 0.5833333333333334,
+    "accepted": false
+  },
+  {
+    "step": 6,
+    "lr": 1,
+    "edits": [
+      {
+        "op": "append",
+        "content": "- Add a generic category rule: if the line starts with the word \"TO\" (case\u2011insensitive) assign category \"transfer\"; if the line contains the keyword \"EATS\" (case\u2011insensitive) assign category \"dining\" (overriding the generic transport rule)."
+      }
+    ],
+    "val_before": 0.8958333333333334,
+    "val_after": 0.9166666666666666,
+    "val_acc_after": 0.6666666666666666,
+    "accepted": true
+  }
+]
