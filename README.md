@@ -1,6 +1,6 @@
 # skillopt-mini
 
-**Train an agent's skill file, not its weights.**
+**Train an agent's skill file, not its model weights. Self evolving AI Agent skills without having to fine-tuning models**
 
 A hands-on reproduction recipe for SkillOpt from Microsoft Research
 ([paper](https://arxiv.org/abs/2605.23904) · [official repo](https://github.com/microsoft/skillopt)):
